@@ -1,0 +1,50 @@
+on:
+  push:
+    branches:
+      - release
+
+name: Create Release
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 18
+        uses: actions/setup-java@v3
+        with:
+          java-version: '18'
+          distribution: 'temurin'
+          settings-path: ${{ github.workspace }}
+      - name: "Set Project Version"
+        id: set_project_version
+        run: |
+          PROJECT_VERSION=$(mvn -q \
+          -Dexec.executable=echo \
+          -Dexec.args='${project.version}' \
+          --non-recursive \
+          exec:exec)
+          echo "VERSION=$PROJECT_VERSION" >> $GITHUB_ENV
+          
+        # TODO ^
+      - name: Create Release
+        id: create_release
+        uses: elgohr/Github-Release-Action@v4
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          title: Release ${{ env.VERSION }}
+
+      - name: Build with Maven
+        run: # TODO
+    
+      - uses: actions/upload-artifact@v3
+        with:
+          name: HelloWorld.jar
+          path: ${{ github.workspace }}/target/HelloWorld-jar-with-dependencies.jar
+          
+      - name: Update release Artifact
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ github.workspace }}/target/ # TODO
+          tag_name: release
