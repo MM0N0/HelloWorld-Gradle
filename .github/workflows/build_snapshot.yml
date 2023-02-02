@@ -17,9 +17,9 @@ jobs:
           settings-path: ${{ github.workspace }}
 
       - name: Build with Gradle
-        run: # TODO
+        run: ./gradlew build
 
       - uses: actions/upload-artifact@v3
         with:
           name: HelloWorld.jar
-          path: ${{ github.workspace }}/ # TODO
+          path: ${{ github.workspace }}/
