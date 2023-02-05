@@ -1,9 +1,8 @@
+name: Build Snapshot Version
 on:
   push:
     branches:
       - dev
-
-name: Build Snapshot Version
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,9 +16,10 @@ jobs:
           settings-path: ${{ github.workspace }}
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: gradle jar
 
-      - uses: actions/upload-artifact@v3
+      - name: Deploy Build Artifacts
+        uses: actions/upload-artifact@v3
         with:
-          name: HelloWorld.jar
-          path: ${{ github.workspace }}/
+          name: HelloWorld-Snapshot
+          path: build/libs/*.jar
