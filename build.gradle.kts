@@ -11,9 +11,10 @@ plugins {
 val versionPropPath = "version.properties"
 val versionProp = initVersionProp()
 version = versionProp.getProperty("version")
+val currDirectory = System.getProperty("user.dir").replace("\\","/")
 
-var tmpArtifactName = "HelloWorld-Gradle-$version.jar"
-var artifactName = "HelloWorld-$version.jar"
+val tmpArtifactName = "HelloWorld-Gradle-$version.jar"
+val artifactName = "HelloWorld-$version.jar"
 
 group = "testpackage.test"
 var mainClass = "testpackage.test.App"
@@ -46,8 +47,7 @@ tasks.withType<Jar>() {
     // rename Artifact
     doLast {
         project.exec {
-            val currDirecory = System.getProperty("user.dir")
-            commandLine("bash", "-c", "cd $currDirecory/build/libs/ && mv $tmpArtifactName $artifactName")
+            commandLine("bash", "-c", "cd $currDirectory/build/libs/ && mv $tmpArtifactName $artifactName")
         }
     }
 }
@@ -62,7 +62,11 @@ fun initVersionProp():Properties {
 // set Version
 tasks.register("setVersion") {
     val version = System.getProperty("version")
-    versionProp.setProperty("version", version)
+    try {
+        versionProp.setProperty("version", version)
+    } catch (e:NullPointerException) {
+        println("setVersion: throws Nullpointer on Windows for some reason. Only use in Linux/wsl")
+    }
     versionProp.store(FileOutputStream(versionPropPath), null)
 }
 
